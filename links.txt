@@ -1,0 +1,22 @@
+==============================================================================
+Sprint 15 Capstone Phase Submission Links Manifest
+Associate Software Engineer: Himesh Singh (PDIT-FTE-11462)
+Directive: Sprint 15 — Capstone Phase: Feature Complete
+==============================================================================
+
+GitHub Repository URL:
+https://github.com/TimeLineOfficial/sprint-15
+
+Live Production Edge Deployment URL:
+https://timelineofficial.github.io/sprint-15/
+
+Technical QA Walkthrough Video URL:
+https://youtu.be/vdJoz7cA2Sg
+
+==============================================================================
+Phase Deliverables Overview:
+• Phase 1 (Core CRUD Execution): Full Create, Read, Update, Delete for shipments & telemetry
+• Phase 2 (Role-Based Access Control): 3-tier authorization matrix with violent 403 rejections
+• Phase 3 (NGINX Load Balancing & Docker): Least-conn reverse proxy & 3-node cluster compose
+• Edge Deployment: Zero-config Express serverless & GitHub Pages edge network
+==============================================================================

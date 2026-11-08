@@ -1,0 +1,165 @@
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # NGINX Reverse Proxy & Load Balancer (Least Connections)
+  # ===========================================================================
+  nginx-lb:
+    image: nginx:1.25-alpine
+    container_name: apextrack-nginx-lb
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      backend-1:
+        condition: service_healthy
+      backend-2:
+        condition: service_healthy
+      backend-3:
+        condition: service_healthy
+    networks:
+      - apextrack-mesh
+
+  # ===========================================================================
+  # Backend Microservice Node 1 (Instance A)
+  # ===========================================================================
+  backend-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apextrack-backend-node-1
+    restart: always
+    environment:
+      - PORT=3000
+      - INSTANCE_ID=node-backend-1
+      - NODE_ENV=production
+      - DB_HOST=postgres-db
+      - REDIS_HOST=redis-cache
+      - JWT_SECRET=apextrack-enterprise-production-jwt-hmac-sha256-key-99812
+    ports:
+      - "3001:3000"
+    depends_on:
+      - postgres-db
+      - redis-cache
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - apextrack-mesh
+
+  # ===========================================================================
+  # Backend Microservice Node 2 (Instance B)
+  # ===========================================================================
+  backend-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apextrack-backend-node-2
+    restart: always
+    environment:
+      - PORT=3000
+      - INSTANCE_ID=node-backend-2
+      - NODE_ENV=production
+      - DB_HOST=postgres-db
+      - REDIS_HOST=redis-cache
+      - JWT_SECRET=apextrack-enterprise-production-jwt-hmac-sha256-key-99812
+    ports:
+      - "3002:3000"
+    depends_on:
+      - postgres-db
+      - redis-cache
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - apextrack-mesh
+
+  # ===========================================================================
+  # Backend Microservice Node 3 (Instance C)
+  # ===========================================================================
+  backend-3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apextrack-backend-node-3
+    restart: always
+    environment:
+      - PORT=3000
+      - INSTANCE_ID=node-backend-3
+      - NODE_ENV=production
+      - DB_HOST=postgres-db
+      - REDIS_HOST=redis-cache
+      - JWT_SECRET=apextrack-enterprise-production-jwt-hmac-sha256-key-99812
+    ports:
+      - "3003:3000"
+    depends_on:
+      - postgres-db
+      - redis-cache
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - apextrack-mesh
+
+  # ===========================================================================
+  # PostgreSQL Relational Database Cluster
+  # ===========================================================================
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: apextrack-postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: apextrack_production
+      POSTGRES_USER: apextrack_admin
+      POSTGRES_PASSWORD: secure_mesh_password_2026!
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apextrack_admin -d apextrack_production"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - apextrack-mesh
+
+  # ===========================================================================
+  # Redis Cache Layer (Telemetry Stream Buffer)
+  # ===========================================================================
+  redis-cache:
+    image: redis:7-alpine
+    container_name: apextrack-redis-cache
+    restart: always
+    command: redis-server --appendonly yes --requirepass "redis_secure_pass_2026"
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - apextrack-mesh
+
+networks:
+  apextrack-mesh:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  pgdata:
+  redisdata:

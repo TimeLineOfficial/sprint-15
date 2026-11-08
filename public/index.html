@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ApexTrack Enterprise — Feature Complete (Sprint 15). Full CRUD, Role-Based Access Control (RBAC), and NGINX Load-Balanced Container Cluster.">
+  <title>ApexTrack Enterprise | Global Telemetry & Fleet Mesh (Sprint 15)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body class="enterprise-theme">
+  <!-- Top Global Header -->
+  <header class="app-header" role="banner">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            <span class="brand-highlight">ApexTrack</span> Enterprise
+            <span class="badge badge-prod">v3.0 Feature Complete</span>
+          </div>
+          <div class="brand-subtitle">Sprint 15 Capstone: Full CRUD · RBAC Matrix · NGINX Load Balancer</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- RBAC Active Identity Display -->
+        <div class="active-identity-card" id="active-identity-card">
+          <div class="identity-role-badge badge-admin" id="identity-role-badge">ADMIN</div>
+          <div class="identity-meta">
+            <span class="identity-name" id="identity-display-name">Marcus Vance</span>
+            <span class="identity-dept" id="identity-dept">Fleet Operations</span>
+          </div>
+        </div>
+
+        <!-- Quick Identity Switcher Dropdown -->
+        <div class="role-selector-group">
+          <label for="select-role-user" class="sr-only">Switch User Role</label>
+          <select id="select-role-user" class="select-role-user" aria-label="Switch User Identity and Role">
+            <option value="admin_marcus" selected>Marcus Vance [ADMIN]</option>
+            <option value="fleet_director">Diana Sterling [ADMIN]</option>
+            <option value="dispatcher_elena">Elena Rostova [DISPATCHER]</option>
+            <option value="operator_sarah">Sarah Chen [DISPATCHER]</option>
+            <option value="auditor_guest">Guest Auditor [VIEWER]</option>
+          </select>
+        </div>
+
+        <button id="btn-cluster-ping" class="btn btn-secondary btn-sm" title="Ping NGINX load balancer">
+          <span class="live-dot pulse"></span> LB Ping
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Violent Rejection / Alert Perimeter Banner -->
+  <div id="violent-rejection-banner" class="violent-rejection-banner" style="display: none;" role="alert">
+    <div class="rejection-content">
+      <div class="rejection-icon">⚠️</div>
+      <div class="rejection-body">
+        <h4 id="rejection-title">SECURITY PERIMETER BREACH :: ACCESS VIOLENTLY REJECTED</h4>
+        <p id="rejection-message">Caller lacking elevated privileges attempted administrative mutation.</p>
+      </div>
+      <button id="btn-dismiss-rejection" class="btn-dismiss" aria-label="Dismiss alert">&times;</button>
+    </div>
+  </div>
+
+  <!-- Primary Navigation Tabs -->
+  <nav class="app-nav" aria-label="Primary Platform Navigation">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="tab-overview">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Overview & Metrics
+      </button>
+      <button class="nav-tab" data-tab="tab-shipments">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        CRUD Shipments Manager
+      </button>
+      <button class="nav-tab" data-tab="tab-telemetry">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        IoT Telemetry Stream
+      </button>
+      <button class="nav-tab" data-tab="tab-rbac">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        RBAC Security Matrix
+      </button>
+      <button class="nav-tab" data-tab="tab-cluster">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+        NGINX & Docker Cluster
+      </button>
+      <button class="nav-tab" data-tab="tab-audit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Immutable Audit Ledger
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main View Container -->
+  <main class="app-main" id="main-content">
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: OVERVIEW & SYSTEM METRICS -->
+    <!-- ===================================================================== -->
+    <section id="tab-overview" class="view-panel active" aria-labelledby="heading-overview">
+      <div class="panel-header">
+        <div>
+          <h2 id="heading-overview" class="panel-title">Enterprise Telemetry & Fleet Mesh Overview</h2>
+          <p class="panel-description">Sprint 15 Feature Complete dashboard with real-time aggregated metrics and cluster telemetry.</p>
+        </div>
+        <div class="panel-actions">
+          <span class="cluster-badge" id="cluster-node-badge">Active Node: NGINX -> backend-1 (least_conn)</span>
+        </div>
+      </div>
+
+      <!-- High-Level KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Managed Shipments</div>
+          <div class="kpi-value" id="kpi-total-shipments">4</div>
+          <div class="kpi-trend text-success">✓ 100% Tracking Fidelity</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Active In-Transit</div>
+          <div class="kpi-value text-accent" id="kpi-in-transit">1</div>
+          <div class="kpi-trend">Autonomous Ground Convoys</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total Gross Tonnage</div>
+          <div class="kpi-value text-warning" id="kpi-tonnage">38.10 t</div>
+          <div class="kpi-trend">Aggregated Cold & Heavy Cargo</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Cluster Nodes (NGINX Mesh)</div>
+          <div class="kpi-value text-success" id="kpi-cluster-nodes">3 / 3</div>
+          <div class="kpi-trend text-success">● Least_Conn Healthy</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Grid -->
+      <div class="overview-grid">
+        <div class="card">
+          <h3 class="card-title">Phase 1: Core CRUD Operational Status</h3>
+          <p class="text-muted">Directly interact with persistent database records through authenticated endpoints:</p>
+          <ul class="checklist">
+            <li><strong class="text-success">CREATE:</strong> Dispatch new shipments with cargo classification, vehicle mapping, and temperature targets.</li>
+            <li><strong class="text-success">READ:</strong> Multi-parameter query engine with search, status filtering, and telemetry drilldowns.</li>
+            <li><strong class="text-success">UPDATE:</strong> Inline field modification, dynamic rerouting, and authenticated status transitions.</li>
+            <li><strong class="text-success">DELETE:</strong> Administrative purge protocol strictly guarded by RBAC permissions.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Phase 2 & 3: Security & High Availability</h3>
+          <div class="status-summary-box">
+            <div class="summary-row">
+              <span>RBAC Perimeter:</span>
+              <span class="badge badge-prod">ACTIVE (3 Tier Matrix)</span>
+            </div>
+            <div class="summary-row">
+              <span>Active Bearer Token:</span>
+              <span id="active-token-status" class="badge badge-info">Signed HMAC-SHA256</span>
+            </div>
+            <div class="summary-row">
+              <span>Reverse Proxy:</span>
+              <span class="badge badge-prod">NGINX 1.25 Alpine</span>
+            </div>
+            <div class="summary-row">
+              <span>Balancing Algorithm:</span>
+              <span class="badge badge-accent">least_conn</span>
+            </div>
+            <div class="summary-row">
+              <span>Container Mesh:</span>
+              <span class="badge badge-prod">Docker Compose (6 Services)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: CRUD SHIPMENTS MANAGER (PHASE 1) -->
+    <!-- ===================================================================== -->
+    <section id="tab-shipments" class="view-panel" aria-labelledby="heading-shipments">
+      <div class="panel-header">
+        <div>
+          <h2 id="heading-shipments" class="panel-title">Core CRUD Shipments Manager</h2>
+          <p class="panel-description">Create, Read, Update, and Delete shipments across North American transit routes.</p>
+        </div>
+        <div class="panel-actions">
+          <button id="btn-open-create-modal" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Dispatch New Shipment
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Filter Controls -->
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <input type="text" id="input-search-shipments" class="form-control" placeholder="Search by Tracking #, Origin, Destination, Vehicle...">
+        </div>
+        <select id="select-status-filter" class="form-control form-select">
+          <option value="">All Statuses</option>
+          <option value="DISPATCHED">DISPATCHED</option>
+          <option value="IN_TRANSIT">IN_TRANSIT</option>
+          <option value="HELD_CUSTOMS">HELD_CUSTOMS</option>
+          <option value="DELIVERED">DELIVERED</option>
+        </select>
+        <select id="select-class-filter" class="form-control form-select">
+          <option value="">All Classifications</option>
+          <option value="COLD_CHAIN_PHARMA">COLD_CHAIN_PHARMA</option>
+          <option value="HIGH_VALUE_ELECTRONICS">HIGH_VALUE_ELECTRONICS</option>
+          <option value="AEROSPACE_COMPONENTS">AEROSPACE_COMPONENTS</option>
+          <option value="PERISHABLE_AGRI">PERISHABLE_AGRI</option>
+        </select>
+        <button id="btn-refresh-shipments" class="btn btn-secondary">Refresh</button>
+      </div>
+
+      <!-- Shipments Table -->
+      <div class="table-container">
+        <table class="enterprise-table" id="table-shipments">
+          <thead>
+            <tr>
+              <th>Tracking #</th>
+              <th>Route (Origin &rarr; Destination)</th>
+              <th>Classification</th>
+              <th>Priority</th>
+              <th>Temp Target</th>
+              <th>Weight</th>
+              <th>Status</th>
+              <th>Assigned Vehicle</th>
+              <th>RBAC Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-shipments">
+            <!-- Dynamically populated via client.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Live Mutation Feedback Console -->
+      <div class="console-box" id="crud-feedback-console">
+        <span class="console-prompt">&gt; System Ready.</span> Awaiting CRUD mutation requests.
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: IOT TELEMETRY STREAM -->
+    <!-- ===================================================================== -->
+    <section id="tab-telemetry" class="view-panel" aria-labelledby="heading-telemetry">
+      <div class="panel-header">
+        <div>
+          <h2 id="heading-telemetry" class="panel-title">Autonomous Fleet IoT Telemetry Mesh</h2>
+          <p class="panel-description">High-frequency sensor stream buffer capturing coordinates, speed, battery, and dry-ice temperatures.</p>
+        </div>
+        <div class="panel-actions">
+          <button id="btn-purge-telemetry" class="btn btn-danger btn-sm" title="Requires ADMIN privilege">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Purge Buffer (Admin)
+          </button>
+        </div>
+      </div>
+
+      <div class="telemetry-grid">
+        <!-- Live Frame Ingestion Form -->
+        <div class="card">
+          <h3 class="card-title">Simulate IoT Sensor Frame Ingestion</h3>
+          <p class="text-muted">Inject an authenticated sensor telemetry packet into the data layer:</p>
+          <form id="form-ingest-telemetry" class="telemetry-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tel-vehicle">Vehicle Identifier</label>
+                <input type="text" id="tel-vehicle" class="form-control" value="VEH-8802" required>
+              </div>
+              <div class="form-group">
+                <label for="tel-speed">Speed (km/h)</label>
+                <input type="number" id="tel-speed" class="form-control" value="96.5" step="0.1" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tel-lat">Latitude</label>
+                <input type="number" id="tel-lat" class="form-control" value="41.8240" step="0.0001" required>
+              </div>
+              <div class="form-group">
+                <label for="tel-lng">Longitude</label>
+                <input type="number" id="tel-lng" class="form-control" value="-71.4128" step="0.0001" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tel-temp">Cargo Temperature (°C)</label>
+                <input type="number" id="tel-temp" class="form-control" value="-19.6" step="0.1" required>
+              </div>
+              <div class="form-group">
+                <label for="tel-battery">Battery (%)</label>
+                <input type="number" id="tel-battery" class="form-control" value="87" min="0" max="100" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Broadcast Telemetry Ingestion</button>
+          </form>
+        </div>
+
+        <!-- Buffer Stream Table -->
+        <div class="card">
+          <h3 class="card-title">Live Ingested Telemetry Buffer</h3>
+          <div class="table-container-sm">
+            <table class="enterprise-table table-sm">
+              <thead>
+                <tr>
+                  <th>Vehicle ID</th>
+                  <th>Coordinates</th>
+                  <th>Speed</th>
+                  <th>Cargo Temp</th>
+                  <th>Battery</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-telemetry">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 4: RBAC SECURITY MATRIX (PHASE 2) -->
+    <!-- ===================================================================== -->
+    <section id="tab-rbac" class="view-panel" aria-labelledby="heading-rbac">
+      <div class="panel-header">
+        <div>
+          <h2 id="heading-rbac" class="panel-title">Phase 2: Role-Based Access Control (RBAC) Perimeter</h2>
+          <p class="panel-description">Strict authorization matrices. Test privilege elevation, forbidden rejections, and cryptographic checks.</p>
+        </div>
+      </div>
+
+      <!-- Identity Switcher & Token Inspector -->
+      <div class="rbac-card-grid">
+        <div class="card">
+          <h3 class="card-title">Current Authentication Token</h3>
+          <div class="token-box" id="token-box">
+            <!-- Token string -->
+          </div>
+          <div class="claims-box" id="claims-box">
+            <!-- Decoded claims -->
+          </div>
+          <div class="rbac-actions">
+            <button id="btn-simulate-forged-token" class="btn btn-warning btn-sm">
+              Simulate Forged JWT (Trigger 403 Rejection)
+            </button>
+            <button id="btn-trigger-unauthenticated" class="btn btn-danger btn-sm">
+              Purge Token (Trigger 401 Rejection)
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Enterprise Authorization Matrix</h3>
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>ADMIN</th>
+                <th>DISPATCHER</th>
+                <th>VIEWER</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CREATE_SHIPMENT</td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-danger">✗ 403 FORBIDDEN</span></td>
+              </tr>
+              <tr>
+                <td>READ_SHIPMENTS</td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+              </tr>
+              <tr>
+                <td>UPDATE_SHIPMENT</td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-danger">✗ 403 FORBIDDEN</span></td>
+              </tr>
+              <tr>
+                <td>STATUS_TRANSITION</td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-success">✓ ALLOWED</span></td>
+                <td><span class="badge badge-danger">✗ 403 FORBIDDEN</span></td>
+              </tr>
+              <tr>
+                <td>DELETE_SHIPMENT</td>
+                <td><span class="badge badge-success">✓ ELEVATED</span></td>
+                <td><span class="badge badge-danger">✗ 403 LOCKED</span></td>
+                <td><span class="badge badge-danger">✗ 403 FORBIDDEN</span></td>
+              </tr>
+              <tr>
+                <td>PURGE_TELEMETRY</td>
+                <td><span class="badge badge-success">✓ ELEVATED</span></td>
+                <td><span class="badge badge-danger">✗ 403 LOCKED</span></td>
+                <td><span class="badge badge-danger">✗ 403 FORBIDDEN</span></td>
+              </tr>
+              <tr>
+                <td>AUDIT_LOG_VIEW</td>
+                <td><span class="badge badge-success">✓ ELEVATED</span></td>
+                <td><span class="badge badge-danger">✗ 403 LOCKED</span></td>
+                <td><span class="badge badge-danger">✗ 403 FORBIDDEN</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 5: NGINX & DOCKER CLUSTER (PHASE 3) -->
+    <!-- ===================================================================== -->
+    <section id="tab-cluster" class="view-panel" aria-labelledby="heading-cluster">
+      <div class="panel-header">
+        <div>
+          <h2 id="heading-cluster" class="panel-title">Phase 3: NGINX Reverse Proxy & Docker Mesh</h2>
+          <p class="panel-description">Multi-instance container orchestration with least_conn load balancing and failover resilience.</p>
+        </div>
+      </div>
+
+      <!-- Cluster Architecture Diagram Box -->
+      <div class="cluster-topology-box">
+        <div class="topology-row topology-header">
+          <div class="topology-component lb-component">
+            <div class="comp-icon">🌐</div>
+            <div class="comp-title">NGINX Reverse Proxy & Load Balancer</div>
+            <div class="comp-meta">Algorithm: <code>least_conn</code> · Port 80 · Rate: 100 req/s</div>
+          </div>
+        </div>
+
+        <div class="topology-connector">
+          <div class="conn-line"></div>
+          <div class="conn-label">Active Round-Robin / Least-Connections Mesh</div>
+        </div>
+
+        <div class="topology-row backend-row">
+          <div class="topology-component backend-node active" id="node-card-1">
+            <div class="node-indicator"></div>
+            <div class="comp-title">backend-1</div>
+            <div class="comp-meta">Port 3001 · Node.js 20 Alpine</div>
+            <span class="badge badge-prod">HEALTHY</span>
+          </div>
+          <div class="topology-component backend-node active" id="node-card-2">
+            <div class="node-indicator"></div>
+            <div class="comp-title">backend-2</div>
+            <div class="comp-meta">Port 3002 · Node.js 20 Alpine</div>
+            <span class="badge badge-prod">HEALTHY</span>
+          </div>
+          <div class="topology-component backend-node active" id="node-card-3">
+            <div class="node-indicator"></div>
+            <div class="comp-title">backend-3</div>
+            <div class="comp-meta">Port 3003 · Node.js 20 Alpine</div>
+            <span class="badge badge-prod">HEALTHY</span>
+          </div>
+        </div>
+
+        <div class="topology-connector">
+          <div class="conn-line"></div>
+        </div>
+
+        <div class="topology-row db-row">
+          <div class="topology-component db-node">
+            <div class="comp-icon">🐘</div>
+            <div class="comp-title">PostgreSQL 16 Cluster</div>
+            <div class="comp-meta">Port 5432 · ACID 3NF Persistence</div>
+          </div>
+          <div class="topology-component redis-node">
+            <div class="comp-icon">⚡</div>
+            <div class="comp-title">Redis 7 In-Memory Cache</div>
+            <div class="comp-meta">Port 6379 · Stream Ring Buffer</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 6: IMMUTABLE AUDIT LEDGER -->
+    <!-- ===================================================================== -->
+    <section id="tab-audit" class="view-panel" aria-labelledby="heading-audit">
+      <div class="panel-header">
+        <div>
+          <h2 id="heading-audit" class="panel-title">Immutable Audit & Security Ledger</h2>
+          <p class="panel-description">Chronological record of all administrative mutations, state transitions, and security perimeter events.</p>
+        </div>
+        <div class="panel-actions">
+          <button id="btn-refresh-audit" class="btn btn-secondary btn-sm">Refresh Audit Feed</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="enterprise-table table-sm">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action Event</th>
+              <th>Actor</th>
+              <th>Target</th>
+              <th>Audit Narrative</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-audit">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- MODALS -->
+  <!-- ======================================================================= -->
+
+  <!-- Modal: Create Shipment -->
+  <div id="modal-create-shipment" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-create-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-create-title">Dispatch New Autonomous Shipment</h3>
+        <button class="btn-close-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="form-create-shipment" class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="create-origin">Origin Logistics Hub *</label>
+            <input type="text" id="create-origin" class="form-control" placeholder="e.g. Dallas Intermodal Center, TX" required>
+          </div>
+          <div class="form-group">
+            <label for="create-destination">Destination Depot *</label>
+            <input type="text" id="create-destination" class="form-control" placeholder="e.g. Phoenix Freight Terminal, AZ" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="create-classification">Cargo Classification</label>
+            <select id="create-classification" class="form-control form-select">
+              <option value="COLD_CHAIN_PHARMA">COLD_CHAIN_PHARMA</option>
+              <option value="HIGH_VALUE_ELECTRONICS">HIGH_VALUE_ELECTRONICS</option>
+              <option value="AEROSPACE_COMPONENTS">AEROSPACE_COMPONENTS</option>
+              <option value="PERISHABLE_AGRI">PERISHABLE_AGRI</option>
+              <option value="STANDARD_FREIGHT">STANDARD_FREIGHT</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="create-priority">Dispatch Priority</label>
+            <select id="create-priority" class="form-control form-select">
+              <option value="CRITICAL">CRITICAL</option>
+              <option value="HIGH">HIGH</option>
+              <option value="STANDARD" selected>STANDARD</option>
+              <option value="LOW">LOW</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="create-weight">Gross Weight (kg) *</label>
+            <input type="number" id="create-weight" class="form-control" value="5000" min="100" max="50000" required>
+          </div>
+          <div class="form-group">
+            <label for="create-temp">Target Temp (°C)</label>
+            <input type="number" id="create-temp" class="form-control" value="20" step="0.5">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="create-vehicle">Assigned Vehicle ID</label>
+          <input type="text" id="create-vehicle" class="form-control" value="VEH-5509">
+        </div>
+        <div class="form-group">
+          <label for="create-notes">Manifest Notes</label>
+          <textarea id="create-notes" class="form-control" rows="2" placeholder="Mandatory handling protocols or escort instructions..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Commit & Dispatch Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Shipment -->
+  <div id="modal-edit-shipment" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-edit-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-edit-title">Edit Shipment Record</h3>
+        <button class="btn-close-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="form-edit-shipment" class="modal-form">
+        <input type="hidden" id="edit-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-origin">Origin Hub</label>
+            <input type="text" id="edit-origin" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-destination">Destination Hub</label>
+            <input type="text" id="edit-destination" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-status">Status Transition</label>
+            <select id="edit-status" class="form-control form-select">
+              <option value="DISPATCHED">DISPATCHED</option>
+              <option value="IN_TRANSIT">IN_TRANSIT</option>
+              <option value="HELD_CUSTOMS">HELD_CUSTOMS</option>
+              <option value="DELIVERED">DELIVERED</option>
+              <option value="CANCELLED">CANCELLED</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-priority">Priority</label>
+            <select id="edit-priority" class="form-control form-select">
+              <option value="CRITICAL">CRITICAL</option>
+              <option value="HIGH">HIGH</option>
+              <option value="STANDARD">STANDARD</option>
+              <option value="LOW">LOW</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-notes">Update Notes</label>
+          <textarea id="edit-notes" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Client Browser Controller Script -->
+  <script src="client.js"></script>
+</body>
+</html>

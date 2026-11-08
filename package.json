@@ -1,0 +1,21 @@
+{
+  "name": "apextrack-feature-complete",
+  "version": "3.0.0",
+  "description": "ApexTrack Enterprise — Feature Complete (Sprint 15 Capstone): Full CRUD, RBAC Matrix, NGINX Load Balancing & Docker Orchestration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test tests/*.test.js",
+    "lint": "node lint.js",
+    "build": "echo 'Build complete'"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

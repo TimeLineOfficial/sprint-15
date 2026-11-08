@@ -1,0 +1,96 @@
+name: Automated CI/CD Pipeline (Sprint 15 Feature Complete)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "ci-cd-sprint-15"
+  cancel-in-progress: false
+
+jobs:
+  # ==========================================================================
+  # Stage 1: Static Analysis, Linting & Code Quality Audit
+  # ==========================================================================
+  lint-and-code-quality:
+    name: "Stage 1: Lint & Code Quality Audit"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Runtime (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Execute Static Linter
+        run: npm run lint
+
+  # ==========================================================================
+  # Stage 2: Automated Unit Test Suite Execution (Mandatory Test Gate)
+  # ==========================================================================
+  test-suite-execution:
+    name: "Stage 2: 16-Test Suite Execution Gate"
+    runs-on: ubuntu-latest
+    needs: [lint-and-code-quality]
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Runtime (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Test Suite (CRUD, RBAC Matrix, Observability)
+        run: npm test
+
+  # ==========================================================================
+  # Stage 3: Production Build & Artifact Packaging (Only if Tests Pass)
+  # ==========================================================================
+  build-and-package:
+    name: "Stage 3: Production Build & Artifact Packaging"
+    runs-on: ubuntu-latest
+    needs: [lint-and-code-quality, test-suite-execution]
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Runtime (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Execute Build Script
+        run: npm run build
+
+      - name: Upload Production Edge Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apextrack-feature-complete-build
+          path: |
+            public/
+            server.js
+            index.js
+            package.json
+          retention-days: 14
