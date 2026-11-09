@@ -538,6 +538,8 @@ body.enterprise-app {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.25rem;
   margin-bottom: 2rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .kpi-stat-card {
@@ -547,6 +549,10 @@ body.enterprise-app {
   padding: 1.4rem;
   backdrop-filter: blur(8px);
   transition: var(--transition);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .kpi-stat-card:hover {
@@ -629,6 +635,8 @@ body.enterprise-app {
   display: grid;
   grid-template-columns: 1.25fr 1fr;
   gap: 1.5rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .surface-card {
@@ -637,6 +645,9 @@ body.enterprise-app {
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   backdrop-filter: blur(8px);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .card-head {
@@ -2021,96 +2032,177 @@ body.enterprise-app {
 @media (max-width: 640px) {
   /* Hero Banner */
   .dashboard-hero {
-    padding: 1.25rem 1rem;
-    margin-bottom: 1.25rem;
+    padding: 1rem 0.85rem;
+    margin-bottom: 1rem;
     border-radius: var(--radius-md);
-    gap: 1rem;
+    gap: 0.85rem;
     flex-direction: column;
     align-items: stretch;
+    max-width: 100%;
+    overflow: hidden;
   }
   .hero-title {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     line-height: 1.25;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
   }
   .hero-sub {
-    font-size: 0.82rem;
-    line-height: 1.45;
+    font-size: 0.8rem;
+    line-height: 1.4;
   }
   .hero-actions {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 0.65rem;
-    margin-top: 0.25rem;
+    gap: 0.55rem;
+    margin-top: 0.2rem;
   }
   .hero-actions .btn {
     width: 100%;
     justify-content: center;
-    padding: 0.8rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
     white-space: nowrap;
   }
 
-  /* KPI Stat Cards — 2x2 Grid Layout */
+  /* KPI Stat Cards — Contained 2x2 Grid Layout */
   .kpi-banner-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.65rem;
-    margin-bottom: 1.25rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 100%;
   }
   .kpi-stat-card {
-    padding: 0.85rem 0.75rem;
+    padding: 0.75rem 0.65rem;
     border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 0.35rem;
+    gap: 0.3rem;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
   }
   .stat-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
+    min-width: 0;
+    gap: 0.25rem;
   }
   .stat-label {
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.65rem;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
   }
   .stat-icon-wrap {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
   }
   .stat-icon-wrap svg {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
   }
   .stat-val-row {
     display: flex;
     align-items: baseline;
-    gap: 0.35rem;
+    gap: 0.25rem;
     flex-wrap: wrap;
+    min-width: 0;
   }
   .stat-num {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     font-weight: 800;
+    line-height: 1.1;
+  }
+  .stat-unit, .stat-status-healthy {
+    font-size: 0.7rem;
   }
   .stat-badge {
-    font-size: 0.6rem;
-    padding: 1px 5px;
+    font-size: 0.58rem;
+    padding: 1px 4px;
+    max-width: 100%;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
   }
   .stat-caption {
-    font-size: 0.65rem;
-    line-height: 1.3;
+    font-size: 0.62rem;
+    line-height: 1.25;
     color: var(--text-dim);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
+  }
+
+  /* Overview Cards & Live Transit Radar */
+  .overview-dual-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .surface-card {
+    padding: 0.85rem 0.65rem;
+    border-radius: var(--radius-md);
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.65rem;
+    width: 100%;
+    max-width: 100%;
+  }
+  .card-head > div {
+    min-width: 0;
+    flex: 1 1 auto;
+    max-width: calc(100% - 90px);
+  }
+  .card-title {
+    font-size: 0.95rem;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+  .card-subtitle {
+    font-size: 0.7rem;
+    line-height: 1.3;
+    margin-top: 0.15rem;
+  }
+  .radar-live-badge {
+    font-size: 0.62rem;
+    padding: 2px 6px;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+  .radar-visual-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .radar-svg {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
   }
 
   /* Shipments Filter Bar */
@@ -2120,6 +2212,8 @@ body.enterprise-app {
     margin-bottom: 1rem;
     flex-direction: column;
     align-items: stretch;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   .filter-search-box {
     min-width: 100%;
@@ -2152,10 +2246,14 @@ body.enterprise-app {
   .shipments-grid-view {
     grid-template-columns: 1fr;
     gap: 0.85rem;
+    width: 100%;
+    max-width: 100%;
   }
   .shipment-card {
-    padding: 1rem;
+    padding: 0.85rem;
     gap: 0.75rem;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   .sc-tracking-num {
     font-size: 0.95rem;
@@ -2196,33 +2294,45 @@ body.enterprise-app {
     grid-template-columns: 1fr;
     gap: 0.75rem;
     margin-bottom: 1.25rem;
+    width: 100%;
+    max-width: 100%;
   }
   .gauge-card {
-    padding: 1rem;
+    padding: 0.85rem;
+    box-sizing: border-box;
   }
   .telemetry-dual-layout {
     grid-template-columns: 1fr;
     gap: 1rem;
+    width: 100%;
+    max-width: 100%;
   }
   .stream-terminal {
     max-height: 320px;
+    width: 100%;
+    max-width: 100%;
   }
 
   /* NGINX Cluster View */
   .node-card {
-    padding: 1rem;
+    padding: 0.85rem;
+    box-sizing: border-box;
   }
   .cluster-ping-terminal {
-    padding: 0.85rem;
+    padding: 0.75rem;
+    box-sizing: border-box;
   }
 
   /* RBAC Security Matrix & Data Tables */
   .rbac-dashboard-grid {
     grid-template-columns: 1fr;
     gap: 0.85rem;
+    width: 100%;
+    max-width: 100%;
   }
   .rbac-role-card {
-    padding: 1rem;
+    padding: 0.85rem;
+    box-sizing: border-box;
   }
   .rbac-table-wrap, 
   .shipments-table-wrapper, 
@@ -2230,6 +2340,8 @@ body.enterprise-app {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   .enterprise-styled-table th, 
   .enterprise-styled-table td {
@@ -2242,6 +2354,7 @@ body.enterprise-app {
   .drawer-panel {
     max-width: 100vw;
     width: 100%;
+    box-sizing: border-box;
   }
   .drawer-body {
     padding: 1rem;
@@ -2257,6 +2370,7 @@ body.enterprise-app {
     display: flex;
     flex-direction: column;
     margin: 0;
+    box-sizing: border-box;
   }
   .modal-body {
     padding: 1rem;
@@ -2284,16 +2398,50 @@ body.enterprise-app {
     font-size: 0.8rem;
     padding: 0.65rem 0.85rem;
   }
+  
+  /* Security Rejection Warning Banner - Compact on Mobile */
+  .security-alert-banner {
+    padding: 0.45rem 0.75rem;
+    box-sizing: border-box;
+  }
   .alert-banner-inner {
-    padding: 0.75rem 1rem;
-    gap: 0.65rem;
+    padding: 0;
+    gap: 0.45rem;
+    align-items: center;
   }
   .alert-icon-wrap {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .alert-icon-wrap svg {
+    width: 14px;
+    height: 14px;
+  }
+  .alert-header-row {
+    gap: 0.35rem;
+    margin-bottom: 0.1rem;
+  }
+  .alert-badge {
+    font-size: 0.55rem;
+    padding: 1px 4px;
+  }
+  .alert-code {
+    font-size: 0.7rem;
   }
   .alert-detail {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .btn-close-alert {
+    padding: 2px 4px;
+    font-size: 1.15rem;
+    margin-left: auto;
   }
 }
 
@@ -2360,17 +2508,24 @@ body.enterprise-app {
     font-size: 0.75rem;
   }
   .app-viewport {
-    padding: 0.75rem 0.5rem;
+    padding: 0.65rem 0.5rem;
+    overflow-x: hidden;
   }
   .kpi-banner-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
   }
   .kpi-stat-card {
-    padding: 0.7rem 0.6rem;
+    padding: 0.65rem 0.5rem;
+  }
+  .stat-label {
+    font-size: 0.6rem;
   }
   .stat-num {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+  }
+  .surface-card {
+    padding: 0.75rem 0.5rem;
   }
   .sc-specs-row {
     grid-template-columns: repeat(3, 1fr);
